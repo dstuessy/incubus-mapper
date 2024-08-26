@@ -83,7 +83,6 @@ local function drawPalette()
   love.graphics.setColor(1, 0, 1, 1)
   love.graphics.rectangle("line", palette.hoverX * palette.tileSize, palette.hoverY * palette.tileSize,
     palette.tileSize, palette.tileSize)
-  love.graphics.setColor(1, 1, 1, 1)
 
   -- draw select box
   love.graphics.setColor(1, 0, 1, 0.2)
@@ -92,6 +91,13 @@ local function drawPalette()
   love.graphics.setColor(1, 0, 1, 1)
   love.graphics.rectangle("line", palette.selectX * palette.tileSize, palette.selectY * palette.tileSize,
     palette.tileSize, palette.tileSize)
+
+  -- draw palette border
+  love.graphics.setColor(0, 0, 0, 1)
+  love.graphics.rectangle("line", palette.x, palette.y, palette.x + palette.cols * palette.tileSize,
+    palette.y + palette.rows * palette.tileSize)
+
+  -- reset color
   love.graphics.setColor(1, 1, 1, 1)
 end
 
