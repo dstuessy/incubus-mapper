@@ -35,7 +35,7 @@ function canvas.insertCanvasTile(mx, my, tindex)
   if x >= 0 and x < r and y >= 0 and y < b then
     local tx, ty = math.floor(x / canvas.tileSize), math.floor(y / canvas.tileSize)
     local tp = ty * canvas.cols + tx
-    canvas.tiles[tp] = tindex
+    canvas.tiles[tp + 1] = tindex
   end
 end
 
