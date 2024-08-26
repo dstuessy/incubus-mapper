@@ -7,6 +7,8 @@ local palette = {
   cols = 0,
   rows = 0,
   count = 0,
+  hoverX = 0,
+  hoverY = 0,
   ---@type (love.Image | nil)[]
   tiles = {}
 }
@@ -56,6 +58,23 @@ local function drawPalette()
     local ty = math.floor(i / palette.cols)
     love.graphics.draw(t, palette.x + tx * palette.tileSize, palette.y + ty * palette.tileSize)
   end
+  if palette.hoverX >= 0 and palette.hoverX < palette.cols and palette.hoverY >= 0 and palette.hoverY < palette.rows then
+    love.graphics.setColor(1, 0, 1, 1)
+    love.graphics.rectangle("line", palette.hoverX * palette.tileSize, palette.hoverY * palette.tileSize,
+      palette.tileSize, palette.tileSize)
+    love.graphics.setColor(1, 1, 1, 1)
+  end
+  love.graphics.setColor(0, 0, 0, 1)
+  love.graphics.rectangle("line", palette.x, palette.y, palette.cols * palette.tileSize, palette.rows * palette.tileSize)
+  love.graphics.setColor(1, 1, 1, 1)
+end
+
+---Sets the palette coordinates for mouse hover
+---@param mx number Mouse x position
+---@param my number Mouse Y position
+local function setPaletteHover(mx, my)
+  palette.hoverX = math.floor(mx / palette.tileSize)
+  palette.hoverY = math.floor(my / palette.tileSize)
 end
 
 function love.load()
@@ -66,11 +85,11 @@ function love.load()
 end
 
 function love.draw()
-  -- love.graphics.scale(2.5, 2.5)
   love.graphics.setBackgroundColor(0.8, 0.8, 0.8, 1)
   drawPalette()
-  -- love.graphics.draw(palette.tiles[25], 20, 20)
 end
 
 function love.update()
+  local mx, my = love.mouse.getPosition()
+  setPaletteHover(mx, my)
 end
