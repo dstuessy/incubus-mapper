@@ -96,14 +96,14 @@ function canvas.serialize()
   local d = {}
   local fmt = ""
 
-  for y = 1, canvas.rows do
-    for x = 1, canvas.cols do
+  for y = 0, canvas.rows - 1 do
+    for x = 0, canvas.cols - 1 do
       local i = y * canvas.cols + x
-      local tindex = canvas.tiles[i]
+      local tindex = canvas.tiles[i + 1]
       if not tindex or tindex == nil then
-        table.insert(d, 0)
+        d[i + 1] = 0
       else
-        table.insert(d, tindex)
+        d[i + 1] = tindex
       end
       fmt = fmt .. "<I"
     end
@@ -124,7 +124,7 @@ function canvas.load(data)
 
   for _ = 1, canvas.rows do
     for _ = 1, canvas.cols do
-      fmt = fmt .. "<I8"
+      fmt = fmt .. "<I"
     end
   end
 
