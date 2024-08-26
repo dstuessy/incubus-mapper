@@ -212,7 +212,7 @@ end
 
 local pmx, pmy = 0, 0
 
-function love.update(dt)
+function love.update()
   local mx, my = love.mouse.getPosition()
 
   setPaletteHover(mx, my)
