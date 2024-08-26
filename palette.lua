@@ -57,6 +57,16 @@ function palette.loadPalette(path, ts)
 end
 
 function palette.drawPalette()
+  -- draw palette border
+  local borderSize = 4
+  love.graphics.setColor(0.8, 0.8, 0.8, 1)
+  love.graphics.rectangle("fill", palette.x - borderSize, palette.y - borderSize,
+    palette.x + palette.cols * palette.tileSize + borderSize * 2,
+    palette.y + palette.rows * palette.tileSize + borderSize * 2)
+  love.graphics.setColor(0, 0, 0, 1)
+  love.graphics.rectangle("line", palette.x - borderSize, palette.y - borderSize,
+    palette.x + palette.cols * palette.tileSize + borderSize * 2,
+    palette.y + palette.rows * palette.tileSize + borderSize * 2)
   -- draw palette bg
   love.graphics.setColor(0, 0, 0, 1)
   love.graphics.rectangle("fill", palette.x, palette.y, palette.x + palette.cols * palette.tileSize,
