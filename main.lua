@@ -142,11 +142,14 @@ local canvas = {
 }
 
 local function setupCanvas()
-  canvas.x = 0
-  canvas.y = 0
+  local w, h = love.graphics.getDimensions()
+  local size = RoomSize * TileSize
+
   canvas.tileSize = TileSize
   canvas.cols = RoomSize
   canvas.rows = RoomSize
+  canvas.x = w / 2 - size / 2
+  canvas.y = h / 2 - size / 2
 end
 
 ---@param mx integer Mouse x position
@@ -154,16 +157,21 @@ end
 ---@param tindex integer Tile index
 local function insertCanvasTile(mx, my, tindex)
   local x, y = mx - canvas.x, my - canvas.y
-  local tx, ty = math.floor(x / canvas.tileSize), math.floor(y / canvas.tileSize)
-  local tp = ty * canvas.cols + tx
-  canvas.tiles[tp] = tindex
+  local r = canvas.cols * canvas.tileSize
+  local b = canvas.rows * canvas.tileSize
+
+  if x >= 0 and x < r and y >= 0 and y < b then
+    local tx, ty = math.floor(x / canvas.tileSize), math.floor(y / canvas.tileSize)
+    local tp = ty * canvas.cols + tx
+    canvas.tiles[tp] = tindex
+  end
 end
 
 local function drawCanvas()
   -- draw canvas bg
   love.graphics.setColor(0, 0, 0, 1)
-  love.graphics.rectangle("fill", canvas.x, canvas.y, canvas.x + canvas.cols * canvas.tileSize,
-    canvas.y + canvas.rows * canvas.tileSize)
+  love.graphics.rectangle("fill", canvas.x, canvas.y, canvas.cols * canvas.tileSize,
+    canvas.rows * canvas.tileSize)
 
   love.graphics.setColor(1, 1, 1, 1)
   for i, tindex in pairs(canvas.tiles) do
@@ -172,7 +180,7 @@ local function drawCanvas()
       if tile ~= nil then
         local x = i % canvas.cols
         local y = (i - x) / canvas.cols
-        love.graphics.draw(tile, x * canvas.tileSize, y * canvas.tileSize)
+        love.graphics.draw(tile, canvas.x + x * canvas.tileSize, canvas.y + y * canvas.tileSize)
       end
     end
   end
@@ -191,6 +199,7 @@ function love.load()
 end
 
 function love.draw()
+  love.graphics.reset()
   love.graphics.setBackgroundColor(0.8, 0.8, 0.8, 1)
   drawCanvas()
   drawPalette()
