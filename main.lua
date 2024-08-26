@@ -117,7 +117,7 @@ local function setPaletteSelect(mx, my)
   local w = palette.cols * palette.tileSize
   local h = palette.rows * palette.tileSize
 
-  if mx >= palette.x and my < palette.x + w and my >= palette.y and my < palette.y + h then
+  if mx >= palette.x and mx < palette.x + w and my >= palette.y and my < palette.y + h then
     palette.selectX = math.floor(mx / palette.tileSize)
     palette.selectY = math.floor(my / palette.tileSize)
     flag = true
