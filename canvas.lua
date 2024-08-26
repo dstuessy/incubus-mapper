@@ -90,4 +90,31 @@ function canvas.moveCanvas(dx, dy)
   canvas.y = canvas.y + dy
 end
 
+---@return nil|love.Data
+function canvas.serialize()
+  local d = {}
+  local fmt = ""
+
+  for y = 1, canvas.rows do
+    for x = 1, canvas.cols do
+      local i = y * canvas.cols + x
+      local tindex = canvas.tiles[i]
+      if not tindex or tindex == nil then
+        table.insert(d, 0)
+      else
+        table.insert(d, tindex)
+      end
+      fmt = fmt .. "<I8"
+    end
+  end
+
+  local data = love.data.pack("data", fmt, unpack(d))
+
+  if type(data) == "string" then
+    return nil
+  end
+
+  return data
+end
+
 return canvas
