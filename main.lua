@@ -189,6 +189,11 @@ local function drawCanvas()
   love.graphics.setColor(1, 1, 1, 1)
 end
 
+local function moveCanvas(dx, dy)
+  canvas.x = canvas.x + dx
+  canvas.y = canvas.y + dy
+end
+
 function love.load()
   print("loading...")
   print("loading palette...")
@@ -205,7 +210,9 @@ function love.draw()
   drawPalette()
 end
 
-function love.update()
+local pmx, pmy = 0, 0
+
+function love.update(dt)
   local mx, my = love.mouse.getPosition()
 
   setPaletteHover(mx, my)
@@ -217,5 +224,9 @@ function love.update()
       local tindex = palette.selectY * palette.cols + palette.selectX
       insertCanvasTile(mx, my, tindex)
     end
+  elseif love.mouse.isDown(2) then
+    moveCanvas(mx - pmx, my - pmy)
   end
+
+  pmx, pmy = mx, my
 end
