@@ -2,7 +2,7 @@
 
 A tilemap level editor, nothing more to it.
 
-Work in progress, use at your own risk.
+Work in progress, you're not gonna get much out of this.
 
 Run the app using [Love2D](https://www.love2d.org/). Install the engine somewhere on your machine and add it to your PATH.
 Then execute the following command.
