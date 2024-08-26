@@ -26,6 +26,16 @@ function love.load(args)
   print("setting up canvas...")
   canvas.setupCanvas()
 
+  local datainfo = love.filesystem.getInfo(datapath)
+
+  if datainfo and datainfo.type == "file" then
+    local data, err = love.filesystem.read("data", datapath)
+    if not data then
+      error(err)
+    end
+    canvas.load(data)
+  end
+
   local _, h = love.graphics.getDimensions()
   saveButton.setup(8, h - 38)
 

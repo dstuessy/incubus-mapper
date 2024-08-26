@@ -51,8 +51,9 @@ function canvas.drawCanvas(ptiles)
     if tindex ~= nil then
       local tile = ptiles[tindex]
       if tile ~= nil then
-        local x = i % canvas.cols
-        local y = (i - x) / canvas.cols
+        local pi = i - 1
+        local x = pi % canvas.cols
+        local y = (pi - x) / canvas.cols
         love.graphics.draw(tile, canvas.x + x * canvas.tileSize, canvas.y + y * canvas.tileSize)
       end
     end
@@ -115,6 +116,20 @@ function canvas.serialize()
   end
 
   return data
+end
+
+---@param data string|love.Data
+function canvas.load(data)
+  local fmt = ""
+
+  for _ = 1, canvas.rows do
+    for _ = 1, canvas.cols do
+      fmt = fmt .. "<I8"
+    end
+  end
+
+  local tiles = { love.data.unpack(fmt, data) }
+  canvas.tiles = tiles
 end
 
 return canvas
