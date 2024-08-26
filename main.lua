@@ -4,24 +4,20 @@ local canvas = require("canvas")
 TileSize = 16
 RoomSize = 32
 
-function love.load(args)
-  local tspath = args[1]
-  local datapath = args[2]
+local tspath = ""
+local datapath = ""
 
-  if #args ~= 1 then
-    error("Missing arguments in command incubus-mapper <path/to/tileset> [<path/to/data>]")
+function love.load(args)
+  tspath = args[1]
+  datapath = args[2]
+
+  if #args ~= 2 then
+    error("Missing arguments in command incubus-mapper <path/to/tileset> <path/to/data>")
   end
 
   local tsinfo = love.filesystem.getInfo(tspath)
   if not tsinfo then
     error("Could not find file: " .. tspath)
-  end
-
-  if args[2] then
-    local datainfo = love.filesystem.getInfo(datapath)
-    if not datainfo then
-      error("Could not find file: " .. datapath)
-    end
   end
 
   print("loading palette...")
