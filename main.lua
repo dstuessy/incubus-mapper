@@ -66,7 +66,6 @@ function love.update()
     local saveClicked = saveButton.down(mx, my)
 
     if saveClicked then
-      saveButton.busy = true
       local data = canvas.serialize()
       if not data then
         error("Could not encode data")
@@ -85,7 +84,6 @@ function love.update()
   elseif love.mouse.isDown(2) then
     canvas.moveCanvas(mx - pmx, my - pmy)
   else
-    saveButton.busy = false
     saveButton.up(mx, my)
   end
 

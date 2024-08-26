@@ -20,7 +20,7 @@ function saveButton.down(mx, my)
   local b = saveButton.y + saveButton.height
   local flag = false
 
-  if saveButton.busy or saveButton.isDown then
+  if saveButton.isDown then
     return flag
   end
 

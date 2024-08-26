@@ -8,7 +8,6 @@ local B = {}
 ---@field width number
 ---@field height number
 ---@field isDown boolean
----@field busy boolean
 ---@field setup fun(x: number, y: number)
 ---@field down fun(mx: number, my: number): boolean
 ---@field up fun(mx: number, my: number): boolean
@@ -26,7 +25,6 @@ function B.newButton()
     width = 0,
     height = 0,
     isDown = false,
-    busy = false,
     setup = function() end,
     down = function() return false end,
     up = function() return false end,
