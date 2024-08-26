@@ -75,6 +75,7 @@ function love.update()
       if not success then
         error(message)
       end
+      print("saved!")
     end
 
     if not paletteSelected and not saveClicked then
