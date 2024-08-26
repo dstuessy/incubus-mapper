@@ -91,6 +91,15 @@ function canvas.moveCanvas(dx, dy)
   canvas.y = canvas.y + dy
 end
 
+---Fill the entire canvas with
+---the given tile index.
+---@param tindex number
+function canvas.fillCanvas(tindex)
+  for i, _ in pairs(canvas.tiles) do
+    canvas.tiles[i] = tindex
+  end
+end
+
 ---@return nil|love.Data
 function canvas.serialize()
   local d = {}

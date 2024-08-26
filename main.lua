@@ -79,7 +79,12 @@ function love.update()
 
     if not paletteSelected and not saveClicked then
       local tindex = palette.selectY * palette.cols + palette.selectX
-      canvas.insertCanvasTile(mx, my, tindex)
+
+      if love.keyboard.isDown("lalt") then
+        canvas.fillCanvas(tindex)
+      else
+        canvas.insertCanvasTile(mx, my, tindex)
+      end
     end
   elseif love.mouse.isDown(2) then
     canvas.moveCanvas(mx - pmx, my - pmy)
