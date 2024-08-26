@@ -1,18 +1,6 @@
 TileSize = 16
-local canvas = {
-  x = 0,
-  y = 0,
-  tileSize = 0,
-  cols = 0,
-  rows = 0,
-  hoverX = 0,
-  hoverY = 0,
-  selectX = 0,
-  selectY = 0,
-  ---Palette indexes
-  ---@type number[]
-  tiles = {}
-}
+RoomSize = 32
+
 local palette = {
   x = 0,
   y = 0,
@@ -30,7 +18,7 @@ local palette = {
 
 ---Load palette image data into a data object.
 ---@param path string Path to image file
----@param ts number Tile size for palette
+---@param ts integer Tile size for palette
 ---@return nil
 local function loadPalette(path, ts)
   ---@type (love.ImageData | nil)[]
@@ -72,7 +60,13 @@ local function loadPalette(path, ts)
 end
 
 local function drawPalette()
+  -- draw palette bg
+  love.graphics.setColor(0, 0, 0, 1)
+  love.graphics.rectangle("fill", palette.x, palette.y, palette.x + palette.cols * palette.tileSize,
+    palette.y + palette.rows * palette.tileSize)
+
   -- draw palette tiles
+  love.graphics.setColor(1, 1, 1, 1)
   for i, t in pairs(palette.tiles) do
     local tx = i % palette.cols
     local ty = math.floor(i / palette.cols)
@@ -102,8 +96,8 @@ local function drawPalette()
 end
 
 ---Sets the palette coordinates for mouse hover
----@param mx number Mouse x position
----@param my number Mouse Y position
+---@param mx integer Mouse x position
+---@param my integer Mouse Y position
 local function setPaletteHover(mx, my)
   local r = palette.x + palette.cols * palette.tileSize
   local b = palette.y + palette.rows * palette.tileSize
@@ -115,26 +109,90 @@ local function setPaletteHover(mx, my)
 end
 
 ---Sets the palette coordinates for mouse select
----@param mx number Mouse x position
----@param my number Mouse y position
+---@param mx integer Mouse x position
+---@param my integer Mouse y position
+---@return boolean flag if palette was clicked
 local function setPaletteSelect(mx, my)
+  local flag = false
   local w = palette.cols * palette.tileSize
   local h = palette.rows * palette.tileSize
+
   if mx >= palette.x and my < palette.x + w and my >= palette.y and my < palette.y + h then
     palette.selectX = math.floor(mx / palette.tileSize)
     palette.selectY = math.floor(my / palette.tileSize)
+    flag = true
   end
+
+  return flag
+end
+
+local canvas = {
+  x = 0,
+  y = 0,
+  tileSize = 0,
+  cols = 0,
+  rows = 0,
+  hoverX = 0,
+  hoverY = 0,
+  selectX = 0,
+  selectY = 0,
+  ---Palette indexes
+  ---@type integer[]
+  tiles = {}
+}
+
+local function setupCanvas()
+  canvas.x = 0
+  canvas.y = 0
+  canvas.tileSize = TileSize
+  canvas.cols = RoomSize
+  canvas.rows = RoomSize
+end
+
+---@param mx integer Mouse x position
+---@param my integer Mouse y position
+---@param tindex integer Tile index
+local function insertCanvasTile(mx, my, tindex)
+  local x, y = mx - canvas.x, my - canvas.y
+  local tx, ty = math.floor(x / canvas.tileSize), math.floor(y / canvas.tileSize)
+  local tp = ty * canvas.cols + tx
+  canvas.tiles[tp] = tindex
+end
+
+local function drawCanvas()
+  -- draw canvas bg
+  love.graphics.setColor(0, 0, 0, 1)
+  love.graphics.rectangle("fill", canvas.x, canvas.y, canvas.x + canvas.cols * canvas.tileSize,
+    canvas.y + canvas.rows * canvas.tileSize)
+
+  love.graphics.setColor(1, 1, 1, 1)
+  for i, tindex in pairs(canvas.tiles) do
+    if tindex ~= nil then
+      local tile = palette.tiles[tindex]
+      if tile ~= nil then
+        local x = i % canvas.cols
+        local y = (i - x) / canvas.cols
+        love.graphics.draw(tile, x * canvas.tileSize, y * canvas.tileSize)
+      end
+    end
+  end
+
+  -- reset color
+  love.graphics.setColor(1, 1, 1, 1)
 end
 
 function love.load()
   print("loading...")
   print("loading palette...")
   loadPalette("design/terrain.png", TileSize)
+  print("setting up canvas...")
+  setupCanvas()
   print("ready!")
 end
 
 function love.draw()
   love.graphics.setBackgroundColor(0.8, 0.8, 0.8, 1)
+  drawCanvas()
   drawPalette()
 end
 
@@ -144,6 +202,11 @@ function love.update()
   setPaletteHover(mx, my)
 
   if love.mouse.isDown(1) then
-    setPaletteSelect(mx, my)
+    local paletteSelected = setPaletteSelect(mx, my)
+
+    if not paletteSelected then
+      local tindex = palette.selectY * palette.cols + palette.selectX
+      insertCanvasTile(mx, my, tindex)
+    end
   end
 end
