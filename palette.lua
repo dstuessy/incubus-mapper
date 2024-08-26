@@ -95,14 +95,19 @@ end
 ---Sets the palette coordinates for mouse hover
 ---@param mx integer Mouse x position
 ---@param my integer Mouse Y position
+---@return boolean flag if the palette was hovered
 function palette.setPaletteHover(mx, my)
   local r = palette.x + palette.cols * palette.tileSize
   local b = palette.y + palette.rows * palette.tileSize
+  local flag = false
 
   if mx >= palette.x and mx < r and my >= palette.y and my < b then
     palette.hoverX = math.floor(mx / palette.tileSize)
     palette.hoverY = math.floor(my / palette.tileSize)
+    flag = true
   end
+
+  return flag
 end
 
 ---Sets the palette coordinates for mouse select

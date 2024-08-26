@@ -25,7 +25,11 @@ local pmx, pmy = 0, 0
 function love.update()
   local mx, my = love.mouse.getPosition()
 
-  palette.setPaletteHover(mx, my)
+  local phovered = palette.setPaletteHover(mx, my)
+
+  if not phovered then
+    canvas.setCanvasHover(mx, my)
+  end
 
   if love.mouse.isDown(1) then
     local paletteSelected = palette.setPaletteSelect(mx, my)

@@ -58,8 +58,31 @@ function canvas.drawCanvas(ptiles)
     end
   end
 
+  -- draw hover box
+  love.graphics.setColor(1, 0, 1, 1)
+  love.graphics.rectangle("line", canvas.hoverX * canvas.tileSize, canvas.hoverY * canvas.tileSize,
+    canvas.tileSize, canvas.tileSize)
+
   -- reset color
   love.graphics.setColor(1, 1, 1, 1)
+end
+
+---Sets the canvas coordinates for mouse hover
+---@param mx integer Mouse x position
+---@param my integer Mouse Y position
+---@return boolean flag if the canvas was hovered
+function canvas.setCanvasHover(mx, my)
+  local r = canvas.x + canvas.cols * canvas.tileSize
+  local b = canvas.y + canvas.rows * canvas.tileSize
+  local flag = false
+
+  if mx >= canvas.x and mx < r and my >= canvas.y and my < b then
+    canvas.hoverX = math.floor(mx / canvas.tileSize)
+    canvas.hoverY = math.floor(my / canvas.tileSize)
+    flag = true
+  end
+
+  return flag
 end
 
 function canvas.moveCanvas(dx, dy)
