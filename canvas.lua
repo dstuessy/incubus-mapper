@@ -105,7 +105,7 @@ function canvas.serialize()
       else
         table.insert(d, tindex)
       end
-      fmt = fmt .. "<I8"
+      fmt = fmt .. "<I"
     end
   end
 
