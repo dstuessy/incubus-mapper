@@ -20,3 +20,5 @@ Click to select a tile from the tileset palette. Click on the canvas to place th
 Hold Left Alt while clicking to fill the whole canvas with the same tile.
 
 Hold Left Shift while dragging to fill a selected area with the same tile.
+
+Hold Right Click to move the canvas around.
