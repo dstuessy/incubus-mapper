@@ -115,9 +115,8 @@ function canvas.drawCanvas(ptiles)
 
   -- draw hover box
   love.graphics.setColor(1, 0, 1, 1)
-  love.graphics.rectangle("line", canvas.hoverX * canvas.tileSize, canvas.hoverY * canvas.tileSize,
+  love.graphics.rectangle("line", canvas.x + canvas.hoverX * canvas.tileSize, canvas.y + canvas.hoverY * canvas.tileSize,
     canvas.tileSize, canvas.tileSize)
-
 
   -- draw select rect
   if canvas.selectRectStart and canvas.selectRectEnd then
@@ -142,13 +141,14 @@ end
 ---@param my integer Mouse Y position
 ---@return boolean flag if the canvas was hovered
 function canvas.setCanvasHover(mx, my)
-  local r = canvas.x + canvas.cols * canvas.tileSize
-  local b = canvas.y + canvas.rows * canvas.tileSize
+  local x, y = mx - canvas.x, my - canvas.y
+  local r = canvas.cols * canvas.tileSize
+  local b = canvas.rows * canvas.tileSize
   local flag = false
 
-  if mx >= canvas.x and mx < r and my >= canvas.y and my < b then
-    canvas.hoverX = math.floor(mx / canvas.tileSize)
-    canvas.hoverY = math.floor(my / canvas.tileSize)
+  if x >= 0 and x < r and y >= 0 and y < b then
+    canvas.hoverX = math.floor(x / canvas.tileSize)
+    canvas.hoverY = math.floor(y / canvas.tileSize)
     flag = true
   end
 
