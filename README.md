@@ -12,3 +12,11 @@ $ love . <target/tileset.png> <target/savefile>
 ```
 
 **Note:** due to limitations with Love2D, the save file is found within Love2D's save folder on your machine. This will vary between different operating systems. See the [Love2D documentation](https://www.love2d.org/wiki/love.filesystem) for your machine's save file location.
+
+### Usage
+
+Click to select a tile from the tileset palette. Click on the canvas to place the selected tile.
+
+Hold Left Alt while clicking to fill the whole canvas with the same tile.
+
+Hold Left Shift while dragging to fill a selected area with the same tile.
