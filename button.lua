@@ -34,4 +34,35 @@ function B.newButton()
   return b
 end
 
+---@param btn Button
+function B.drawHighlights(btn)
+  local c = btn.color
+  local hlghtT = { 1, 1, 1, 0.4 }
+  local hlghtL = { 1, 1, 1, 0.2 }
+  local hlghtR = { 0, 0, 0, 0.2 }
+  local hlghtB = { 0, 0, 0, 0.4 }
+
+  if btn.isDown then
+    local tmp = { unpack(hlghtT) }
+    hlghtT = hlghtB
+    hlghtB = tmp
+
+    tmp = { unpack(hlghtL) }
+    hlghtL = hlghtR
+    hlghtR = tmp
+  end
+
+  if c ~= nil then
+    local w = 4
+    love.graphics.setColor(unpack(hlghtT))
+    love.graphics.rectangle("fill", btn.x, btn.y, btn.width, w)
+    love.graphics.setColor(unpack(hlghtL))
+    love.graphics.rectangle("fill", btn.x, btn.y, w, btn.height)
+    love.graphics.setColor(unpack(hlghtR))
+    love.graphics.rectangle("fill", btn.x + btn.width - w, btn.y, w, btn.height)
+    love.graphics.setColor(unpack(hlghtB))
+    love.graphics.rectangle("fill", btn.x, btn.y + btn.height - w, btn.width, w)
+  end
+end
+
 return B

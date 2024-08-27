@@ -49,6 +49,8 @@ function saveButton.draw()
   love.graphics.rectangle("fill", saveButton.x, saveButton.y, saveButton.width, saveButton.height)
   love.graphics.setColor(0, 0, 0, 1)
   love.graphics.print(saveButton.text, saveButton.x + 20, saveButton.y + 5, 0, 1.3, 1.3)
+
+  button.drawHighlights(saveButton)
 end
 
 return saveButton
