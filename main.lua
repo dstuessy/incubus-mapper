@@ -82,6 +82,12 @@ function love.update()
 
       if love.keyboard.isDown("lalt") then
         canvas.fillCanvas(tindex)
+      elseif love.keyboard.isDown("lshift") then
+        if not canvas.selectRectStart then
+          canvas.setSelectRectStart(mx, my)
+        else
+          canvas.setSelectRectEnd(mx, my)
+        end
       else
         canvas.insertCanvasTile(mx, my, tindex)
       end
@@ -90,6 +96,12 @@ function love.update()
     canvas.moveCanvas(mx - pmx, my - pmy)
   else
     saveButton.up(mx, my)
+
+    if love.keyboard.isDown("lshift") and canvas.selectRectStart and canvas.selectRectEnd then
+      local tindex = palette.selectY * palette.cols + palette.selectX
+      canvas.fillSelectRect(tindex)
+      canvas.clearSelectRect()
+    end
   end
 
   pmx, pmy = mx, my

@@ -8,6 +8,10 @@ local canvas = {
   hoverY = 0,
   selectX = 0,
   selectY = 0,
+  ---@type nil|number[]
+  selectRectStart = nil,
+  ---@type nil|number[]
+  selectRectEnd = nil,
   ---Palette indexes
   ---@type integer[]
   tiles = {}
@@ -36,7 +40,57 @@ function canvas.insertCanvasTile(mx, my, tindex)
     local tx, ty = math.floor(x / canvas.tileSize), math.floor(y / canvas.tileSize)
     local tp = ty * canvas.cols + tx
     canvas.tiles[tp + 1] = tindex
+    canvas.selectX, canvas.selectY = tx, ty
   end
+end
+
+---@param mx integer Mouse x position
+---@param my integer Mouse y position
+function canvas.setSelectRectStart(mx, my)
+  local x, y = mx - canvas.x, my - canvas.y
+  local r = canvas.cols * canvas.tileSize
+  local b = canvas.rows * canvas.tileSize
+
+  if x >= 0 and x < r and y >= 0 and y < b then
+    local tx, ty = math.floor(x / canvas.tileSize), math.floor(y / canvas.tileSize)
+    canvas.selectRectStart = {
+      x = tx,
+      y = ty
+    }
+  end
+end
+
+---@param mx integer Mouse x position
+---@param my integer Mouse y position
+function canvas.setSelectRectEnd(mx, my)
+  local x, y = mx - canvas.x, my - canvas.y
+  local r = canvas.cols * canvas.tileSize
+  local b = canvas.rows * canvas.tileSize
+
+  if x >= 0 and x < r and y >= 0 and y < b then
+    local tx, ty = math.floor(x / canvas.tileSize), math.floor(y / canvas.tileSize)
+    canvas.selectRectEnd = {
+      x = tx,
+      y = ty
+    }
+  end
+end
+
+---@param tindex integer Tile index
+function canvas.fillSelectRect(tindex)
+  for i, _ in pairs(canvas.tiles) do
+    local pi = i - 1
+    local x = (pi % canvas.cols) + 1
+    local y = ((pi - x) / canvas.cols) + 1
+    if x > canvas.selectRectStart.x and x <= canvas.selectRectEnd.x and y > canvas.selectRectStart.y and y <= canvas.selectRectEnd.y then
+      canvas.tiles[i] = tindex
+    end
+  end
+end
+
+function canvas.clearSelectRect()
+  canvas.selectRectStart = nil
+  canvas.selectRectEnd = nil
 end
 
 ---@param ptiles (love.Image | nil)[] Palette tiles
@@ -63,6 +117,21 @@ function canvas.drawCanvas(ptiles)
   love.graphics.setColor(1, 0, 1, 1)
   love.graphics.rectangle("line", canvas.hoverX * canvas.tileSize, canvas.hoverY * canvas.tileSize,
     canvas.tileSize, canvas.tileSize)
+
+
+  -- draw select rect
+  if canvas.selectRectStart and canvas.selectRectEnd then
+    love.graphics.setColor(1, 0, 1, 0.1)
+    love.graphics.rectangle("fill", canvas.x + canvas.selectRectStart.x * canvas.tileSize,
+      canvas.y + canvas.selectRectStart.y * canvas.tileSize,
+      (canvas.selectRectEnd.x - canvas.selectRectStart.x) * canvas.tileSize,
+      (canvas.selectRectEnd.y - canvas.selectRectStart.y) * canvas.tileSize)
+    love.graphics.setColor(1, 0, 1, 1)
+    love.graphics.rectangle("line", canvas.x + canvas.selectRectStart.x * canvas.tileSize,
+      canvas.y + canvas.selectRectStart.y * canvas.tileSize,
+      (canvas.selectRectEnd.x - canvas.selectRectStart.x) * canvas.tileSize,
+      (canvas.selectRectEnd.y - canvas.selectRectStart.y) * canvas.tileSize)
+  end
 
   -- reset color
   love.graphics.setColor(1, 1, 1, 1)
