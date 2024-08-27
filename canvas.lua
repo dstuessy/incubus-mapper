@@ -68,7 +68,7 @@ function canvas.setSelectRectEnd(mx, my)
   local b = canvas.rows * canvas.tileSize
 
   if x >= 0 and x < r and y >= 0 and y < b then
-    local tx, ty = math.ceil(x / canvas.tileSize), math.ceil(y / canvas.tileSize)
+    local tx, ty = math.floor(x / canvas.tileSize), math.floor(y / canvas.tileSize)
     canvas.selectRectEnd = {
       x = tx,
       y = ty
@@ -80,9 +80,15 @@ end
 function canvas.fillSelectRect(tindex)
   for i, _ in pairs(canvas.tiles) do
     local pi = i - 1
-    local x = (pi % canvas.cols) + 1
-    local y = ((pi - x) / canvas.cols) + 1
-    if x > canvas.selectRectStart.x and x <= canvas.selectRectEnd.x and y > canvas.selectRectStart.y and y <= canvas.selectRectEnd.y then
+    local x = (pi % canvas.cols)
+    local y = ((pi - x) / canvas.cols)
+
+    local minx = math.min(canvas.selectRectStart.x, canvas.selectRectEnd.x)
+    local miny = math.min(canvas.selectRectStart.y, canvas.selectRectEnd.y)
+    local maxx = math.max(canvas.selectRectStart.x, canvas.selectRectEnd.x)
+    local maxy = math.max(canvas.selectRectStart.y, canvas.selectRectEnd.y)
+
+    if x >= minx and x <= maxx and y >= miny and y <= maxy then
       canvas.tiles[i] = tindex
     end
   end
@@ -120,16 +126,22 @@ function canvas.drawCanvas(ptiles)
 
   -- draw select rect
   if canvas.selectRectStart and canvas.selectRectEnd then
+    local minx = math.min(canvas.selectRectEnd.x, canvas.selectRectStart.x)
+    local maxx = math.max(canvas.selectRectEnd.x, canvas.selectRectStart.x)
+
+    local miny = math.min(canvas.selectRectEnd.y, canvas.selectRectStart.y)
+    local maxy = math.max(canvas.selectRectEnd.y, canvas.selectRectStart.y)
+
     love.graphics.setColor(1, 0, 1, 0.1)
-    love.graphics.rectangle("fill", canvas.x + canvas.selectRectStart.x * canvas.tileSize,
-      canvas.y + canvas.selectRectStart.y * canvas.tileSize,
-      (canvas.selectRectEnd.x - canvas.selectRectStart.x) * canvas.tileSize,
-      (canvas.selectRectEnd.y - canvas.selectRectStart.y) * canvas.tileSize)
+    love.graphics.rectangle("fill", canvas.x + minx * canvas.tileSize,
+      canvas.y + miny * canvas.tileSize,
+      (maxx - minx + 1) * canvas.tileSize,
+      (maxy - miny + 1) * canvas.tileSize)
     love.graphics.setColor(1, 0, 1, 1)
-    love.graphics.rectangle("line", canvas.x + canvas.selectRectStart.x * canvas.tileSize,
-      canvas.y + canvas.selectRectStart.y * canvas.tileSize,
-      (canvas.selectRectEnd.x - canvas.selectRectStart.x) * canvas.tileSize,
-      (canvas.selectRectEnd.y - canvas.selectRectStart.y) * canvas.tileSize)
+    love.graphics.rectangle("line", canvas.x + minx * canvas.tileSize,
+      canvas.y + miny * canvas.tileSize,
+      (maxx - minx + 1) * canvas.tileSize,
+      (maxy - miny + 1) * canvas.tileSize)
   end
 
   -- reset color
