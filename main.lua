@@ -40,6 +40,7 @@ function love.load(args)
   saveButton.setup(8, h - 38)
 
   print("ready!")
+  love.graphics.setBackgroundColor(0.8, 0.8, 0.8, 1)
 end
 
 function love.draw()
