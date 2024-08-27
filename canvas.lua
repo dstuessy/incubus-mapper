@@ -96,7 +96,9 @@ end
 ---@param tindex number
 function canvas.fillCanvas(tindex)
   for i, _ in pairs(canvas.tiles) do
-    canvas.tiles[i] = tindex
+    if i <= canvas.cols * canvas.rows then
+      canvas.tiles[i] = tindex
+    end
   end
 end
 
