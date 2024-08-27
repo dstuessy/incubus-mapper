@@ -68,7 +68,7 @@ function canvas.setSelectRectEnd(mx, my)
   local b = canvas.rows * canvas.tileSize
 
   if x >= 0 and x < r and y >= 0 and y < b then
-    local tx, ty = math.floor(x / canvas.tileSize), math.floor(y / canvas.tileSize)
+    local tx, ty = math.ceil(x / canvas.tileSize), math.ceil(y / canvas.tileSize)
     canvas.selectRectEnd = {
       x = tx,
       y = ty
