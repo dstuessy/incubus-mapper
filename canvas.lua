@@ -12,6 +12,7 @@ local canvas = {
   selectRectStart = nil,
   ---@type nil|number[]
   selectRectEnd = nil,
+  showMeta = false,
   ---Palette indexes
   ---@type integer[]
   tiles = {}
@@ -106,7 +107,6 @@ function canvas.drawCanvas(ptiles)
   love.graphics.rectangle("fill", canvas.x, canvas.y, canvas.cols * canvas.tileSize,
     canvas.rows * canvas.tileSize)
 
-  love.graphics.setColor(1, 1, 1, 1)
   for i, tindex in pairs(canvas.tiles) do
     if tindex ~= nil then
       local tile = ptiles[tindex]
@@ -114,6 +114,7 @@ function canvas.drawCanvas(ptiles)
         local pi = i - 1
         local x = pi % canvas.cols
         local y = (pi - x) / canvas.cols
+        love.graphics.setColor(1, 1, 1, 1)
         love.graphics.draw(tile, canvas.x + x * canvas.tileSize, canvas.y + y * canvas.tileSize)
       end
     end
@@ -123,6 +124,12 @@ function canvas.drawCanvas(ptiles)
   love.graphics.setColor(1, 0, 1, 1)
   love.graphics.rectangle("line", canvas.x + canvas.hoverX * canvas.tileSize, canvas.y + canvas.hoverY * canvas.tileSize,
     canvas.tileSize, canvas.tileSize)
+  -- show tile index
+  if canvas.showMeta then
+    local x = canvas.x + canvas.hoverX * canvas.tileSize
+    local y = canvas.y + (canvas.hoverY - 1) * canvas.tileSize
+    love.graphics.print(canvas.hoverX .. ", " .. canvas.hoverY, x, y)
+  end
 
   -- draw select rect
   if canvas.selectRectStart and canvas.selectRectEnd then

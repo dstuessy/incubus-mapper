@@ -103,6 +103,12 @@ function love.update()
       canvas.fillSelectRect(tindex)
       canvas.clearSelectRect()
     end
+
+    if love.keyboard.isDown("tab") then
+      canvas.showMeta = true
+    else
+      canvas.showMeta = false
+    end
   end
 
   pmx, pmy = mx, my
