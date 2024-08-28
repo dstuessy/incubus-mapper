@@ -204,7 +204,7 @@ function canvas.serialize()
       else
         d[i + 1] = tindex
       end
-      fmt = fmt .. "<I"
+      fmt = fmt .. "<I1"
     end
   end
 
@@ -223,7 +223,7 @@ function canvas.load(data)
 
   for _ = 1, canvas.rows do
     for _ = 1, canvas.cols do
-      fmt = fmt .. "<I"
+      fmt = fmt .. "<I1"
     end
   end
 
