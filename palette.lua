@@ -1,3 +1,4 @@
+---@class Palette
 local palette = {
   x = 0,
   y = 0,

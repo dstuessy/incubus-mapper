@@ -4,6 +4,7 @@ local saveButton = require("saveButton")
 
 TileSize = 16
 RoomSize = 32
+Layers = 3
 
 local tspath = ""
 local datapath = ""

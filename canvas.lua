@@ -13,9 +13,14 @@ local canvas = {
   ---@type nil|number[]
   selectRectEnd = nil,
   showMeta = false,
+  currentLayer = 1,
   ---Palette indexes
-  ---@type integer[]
-  tiles = {}
+  ---@type integer[][]
+  tiles = {
+    {},
+    {},
+    {}
+  }
 }
 
 function canvas.setupCanvas()
@@ -29,6 +34,10 @@ function canvas.setupCanvas()
   canvas.y = h / 2 - size / 2
 end
 
+function canvas.getCurrentLayer()
+  return canvas.tiles[canvas.currentLayer]
+end
+
 ---@param mx integer Mouse x position
 ---@param my integer Mouse y position
 ---@param tindex integer Tile index
@@ -37,10 +46,15 @@ function canvas.insertCanvasTile(mx, my, tindex)
   local r = canvas.cols * canvas.tileSize
   local b = canvas.rows * canvas.tileSize
 
+  local layer = canvas.getCurrentLayer()
+  if not layer then
+    return
+  end
+
   if x >= 0 and x < r and y >= 0 and y < b then
     local tx, ty = math.floor(x / canvas.tileSize), math.floor(y / canvas.tileSize)
     local tp = ty * canvas.cols + tx
-    canvas.tiles[tp + 1] = tindex
+    layer[tp + 1] = tindex
     canvas.selectX, canvas.selectY = tx, ty
   end
 end
@@ -79,7 +93,8 @@ end
 
 ---@param tindex integer Tile index
 function canvas.fillSelectRect(tindex)
-  for i, _ in pairs(canvas.tiles) do
+  local layer = canvas.getCurrentLayer()
+  for i, _ in pairs(layer) do
     local pi = i - 1
     local x = (pi % canvas.cols)
     local y = ((pi - x) / canvas.cols)
@@ -90,7 +105,7 @@ function canvas.fillSelectRect(tindex)
     local maxy = math.max(canvas.selectRectStart.y, canvas.selectRectEnd.y)
 
     if x >= minx and x <= maxx and y >= miny and y <= maxy then
-      canvas.tiles[i] = tindex
+      layer[i] = tindex
     end
   end
 end
@@ -107,15 +122,19 @@ function canvas.drawCanvas(ptiles)
   love.graphics.rectangle("fill", canvas.x, canvas.y, canvas.cols * canvas.tileSize,
     canvas.rows * canvas.tileSize)
 
-  for i, tindex in pairs(canvas.tiles) do
-    if tindex ~= nil then
-      local tile = ptiles[tindex]
-      if tile ~= nil then
-        local pi = i - 1
-        local x = pi % canvas.cols
-        local y = (pi - x) / canvas.cols
-        love.graphics.setColor(1, 1, 1, 1)
-        love.graphics.draw(tile, canvas.x + x * canvas.tileSize, canvas.y + y * canvas.tileSize)
+  for li, layer in pairs(canvas.tiles) do
+    if li <= canvas.currentLayer then
+      for i, tindex in pairs(layer) do
+        if tindex ~= nil then
+          local tile = ptiles[tindex]
+          if tile ~= nil then
+            local pi = i - 1
+            local x = pi % canvas.cols
+            local y = (pi - x) / canvas.cols
+            love.graphics.setColor(1, 1, 1, 1)
+            love.graphics.draw(tile, canvas.x + x * canvas.tileSize, canvas.y + y * canvas.tileSize)
+          end
+        end
       end
     end
   end
@@ -183,28 +202,32 @@ end
 ---the given tile index.
 ---@param tindex number
 function canvas.fillCanvas(tindex)
-  for i, _ in pairs(canvas.tiles) do
-    if i <= canvas.cols * canvas.rows then
-      canvas.tiles[i] = tindex
-    end
+  local layer = canvas.getCurrentLayer()
+  local maxidx = canvas.cols * canvas.rows
+
+  for i = 1, maxidx do
+    layer[i] = tindex
   end
 end
 
 ---@return nil|love.Data
 function canvas.serialize()
+  ---@type integer[]
   local d = {}
   local fmt = ""
 
-  for y = 0, canvas.rows - 1 do
-    for x = 0, canvas.cols - 1 do
-      local i = y * canvas.cols + x
-      local tindex = canvas.tiles[i + 1]
-      if not tindex or tindex == nil then
-        d[i + 1] = 0
-      else
-        d[i + 1] = tindex
+  for li = 0, Layers - 1 do
+    for y = 0, canvas.rows - 1 do
+      for x = 0, canvas.cols - 1 do
+        local i = y * canvas.cols + x
+        local tindex = canvas.tiles[li + 1][i + 1]
+        if not tindex or tindex == nil then
+          table.insert(d, 0)
+        else
+          table.insert(d, tindex)
+        end
+        fmt = fmt .. "<I1"
       end
-      fmt = fmt .. "<I1"
     end
   end
 
@@ -221,13 +244,33 @@ end
 function canvas.load(data)
   local fmt = ""
 
-  for _ = 1, canvas.rows do
+  for _ = 1, canvas.rows * Layers do
     for _ = 1, canvas.cols do
       fmt = fmt .. "<I1"
     end
   end
 
-  local tiles = { love.data.unpack(fmt, data) }
+  ---@type integer[][]
+  local tiles = {
+    {},
+    {},
+    {}
+  }
+
+  local d = { love.data.unpack(fmt, data) }
+
+  -- avoid the last two entries from unpack
+  -- because they are the first index and
+  -- the size of the data, not data itself
+  for i = 1, #d - 2 do
+    local t = d[i]
+    if type(t) == "number" then
+      local l = math.floor(math.floor(i / canvas.cols) / canvas.rows)
+      local li = i - (l * canvas.rows) * canvas.cols
+      tiles[l + 1][li] = math.floor(t)
+    end
+  end
+
   canvas.tiles = tiles
 end
 
