@@ -1,10 +1,12 @@
 local palette = require("palette")
 local canvas = require("canvas")
 local saveButton = require("saveButton")
+local layerPalette = require("layerPalette")
 
 TileSize = 16
 RoomSize = 32
 Layers = 3
+TransparentTile = 0 -- for layers above 1
 
 local tspath = ""
 local datapath = ""
@@ -40,6 +42,8 @@ function love.load(args)
   local _, h = love.graphics.getDimensions()
   saveButton.setup(8, h - 38)
 
+  layerPalette.setup()
+
   print("ready!")
   love.graphics.setBackgroundColor(0.8, 0.8, 0.8, 1)
 end
@@ -49,6 +53,7 @@ function love.draw()
   love.graphics.setBackgroundColor(0.8, 0.8, 0.8, 1)
   canvas.drawCanvas(palette.tiles)
   palette.drawPalette()
+  layerPalette.draw(canvas.currentLayer)
   saveButton.draw()
 end
 
@@ -58,14 +63,20 @@ function love.update()
   local mx, my = love.mouse.getPosition()
 
   local phovered = palette.setPaletteHover(mx, my)
+  local lhovered = layerPalette.setHover(mx, my)
 
-  if not phovered then
+  if not phovered and not lhovered then
     canvas.setCanvasHover(mx, my)
   end
 
   if love.mouse.isDown(1) then
     local paletteSelected = palette.setPaletteSelect(mx, my)
     local saveClicked = saveButton.down(mx, my)
+    local selectedLayer = layerPalette.select(mx, my)
+
+    if selectedLayer > 0 then
+      canvas.currentLayer = selectedLayer
+    end
 
     if saveClicked then
       local data = canvas.serialize()

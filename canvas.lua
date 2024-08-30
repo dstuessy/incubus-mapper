@@ -131,8 +131,11 @@ function canvas.drawCanvas(ptiles)
             local pi = i - 1
             local x = pi % canvas.cols
             local y = (pi - x) / canvas.cols
-            love.graphics.setColor(1, 1, 1, 1)
-            love.graphics.draw(tile, canvas.x + x * canvas.tileSize, canvas.y + y * canvas.tileSize)
+
+            if tindex ~= TransparentTile or li == 1 then
+              love.graphics.setColor(1, 1, 1, 1)
+              love.graphics.draw(tile, canvas.x + x * canvas.tileSize, canvas.y + y * canvas.tileSize)
+            end
           end
         end
       end
