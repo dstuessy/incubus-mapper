@@ -4,7 +4,7 @@ local saveButton = require("saveButton")
 local layerPalette = require("layerPalette")
 
 TileSize = 8
-RoomSize = 32
+RoomSize = 48
 Layers = 3
 TransparentTile = 0 -- for layers above 1
 

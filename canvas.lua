@@ -286,10 +286,21 @@ function canvas.fillTiles(tindexes)
   end
 end
 
+---@param list table
+---@param start integer
+---@param last integer
+local function unpackChunk(list, start, last)
+  start = start or 1
+  last = last or #list
+  if start <= last then
+    return list[start], unpackChunk(list, start + 1, last)
+  end
+end
+
 ---@return nil|love.Data
 function canvas.serialize()
   ---@type integer[]
-  local d = {}
+  local data = {}
   local fmt = ""
 
   for li = 0, Layers - 1 do
@@ -298,22 +309,22 @@ function canvas.serialize()
         local i = y * canvas.cols + x
         local tindex = canvas.tiles[li + 1][i + 1]
         if not tindex or tindex == nil then
-          table.insert(d, 0)
+          table.insert(data, 0)
         else
-          table.insert(d, tindex)
+          table.insert(data, tindex)
         end
-        fmt = fmt .. "<I1"
+        fmt = fmt .. "<I2"
       end
     end
   end
 
-  local data = love.data.pack("data", fmt, unpack(d))
+  local s = love.data.pack("data", fmt, unpack(data))
 
-  if type(data) == "string" then
+  if type(s) == "string" then
     return nil
   end
 
-  return data
+  return s
 end
 
 ---@param data string|love.Data
@@ -322,7 +333,7 @@ function canvas.load(data)
 
   for _ = 1, canvas.rows * Layers do
     for _ = 1, canvas.cols do
-      fmt = fmt .. "<I1"
+      fmt = fmt .. "<I2"
     end
   end
 
