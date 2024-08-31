@@ -122,7 +122,7 @@ function palette.drawPalette()
     local tidx = palette.hoverY * palette.cols + palette.hoverX
     local x = palette.x + palette.hoverX * palette.tileSize
     local y = palette.y + palette.hoverY * palette.tileSize
-    love.graphics.print(tidx .. " : " .. palette.hoverX .. ", " .. palette.hoverY, x, y + palette.tileSize)
+    love.graphics.print(tidx .. " : " .. palette.hoverX .. ", " .. palette.hoverY, x + palette.tileSize * 1.5, y)
   end
 
   -- reset color
