@@ -3,7 +3,7 @@ local canvas = require("canvas")
 local saveButton = require("saveButton")
 local layerPalette = require("layerPalette")
 
-TileSize = 16
+TileSize = 8
 RoomSize = 32
 Layers = 3
 TransparentTile = 0 -- for layers above 1
@@ -91,10 +91,10 @@ function love.update()
     end
 
     if not paletteSelected and not saveClicked then
-      local tindex = palette.selectY * palette.cols + palette.selectX
+      local tindexes = palette.getSelectedTiles()
 
       if love.keyboard.isDown("lalt") then
-        canvas.fillCanvas(tindex)
+        canvas.fillTiles(tindexes)
       elseif love.keyboard.isDown("lshift") then
         if not canvas.selectRectStart then
           canvas.setSelectRectStart(mx, my)
@@ -102,7 +102,7 @@ function love.update()
           canvas.setSelectRectEnd(mx, my)
         end
       else
-        canvas.insertCanvasTile(mx, my, tindex)
+        canvas.insertTiles(mx, my, tindexes)
       end
     end
   elseif love.mouse.isDown(2) then
@@ -111,8 +111,8 @@ function love.update()
     saveButton.up(mx, my)
 
     if love.keyboard.isDown("lshift") and canvas.selectRectStart and canvas.selectRectEnd then
-      local tindex = palette.selectY * palette.cols + palette.selectX
-      canvas.fillSelectRect(tindex)
+      local tindexes = palette.getSelectedTiles()
+      canvas.fillSelectRectTiles(tindexes)
       canvas.clearSelectRect()
     end
 

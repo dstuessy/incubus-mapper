@@ -113,6 +113,20 @@ function palette.drawPalette()
   love.graphics.setColor(1, 1, 1, 1)
 end
 
+---@return integer[][]
+function palette.getSelectedTiles()
+  return {
+    {
+      palette.selectY * palette.cols + palette.selectX,
+      (palette.selectY) * palette.cols + palette.selectX + 1,
+    },
+    {
+      (palette.selectY + 1) * palette.cols + palette.selectX,
+      (palette.selectY + 1) * palette.cols + palette.selectX + 1,
+    }
+  }
+end
+
 ---Sets the palette coordinates for mouse hover
 ---@param mx integer Mouse x position
 ---@param my integer Mouse Y position

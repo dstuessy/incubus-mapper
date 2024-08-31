@@ -6,8 +6,8 @@ local canvas = {
   rows = 0,
   hoverX = 0,
   hoverY = 0,
-  selectX = 0,
-  selectY = 0,
+  hoverW = 2,
+  hoverH = 2,
   ---@type nil|number[]
   selectRectStart = nil,
   ---@type nil|number[]
@@ -52,7 +52,38 @@ function canvas.insertCanvasTile(mx, my, tindex)
     local tx, ty = math.floor(x / canvas.tileSize), math.floor(y / canvas.tileSize)
     local tp = ty * canvas.cols + tx
     layer[tp + 1] = tindex
-    canvas.selectX, canvas.selectY = tx, ty
+  end
+end
+
+---@param tiles integer[] List of tiles
+---@param x integer Top left position of tile rectangle
+---@param y integer Top left position of tile rectangle
+---@param tindexes integer[][] Tile indexes in rectangle shape
+function canvas.insertTileRect(tiles, x, y, tindexes)
+  for sy, row in pairs(tindexes) do
+    for sx, tindex in pairs(row) do
+      local xi = x + sx - 1
+      local yi = y + sy - 1
+      local i = yi * canvas.cols + xi
+      tiles[i + 1] = tindex
+    end
+  end
+end
+
+---@param mx integer Mouse x position
+---@param my integer Mouse y position
+---@param tindexes integer[][] Tile indexes in rectangle shape
+function canvas.insertTiles(mx, my, tindexes)
+  local x, y = mx - canvas.x, my - canvas.y
+  local tx, ty = math.floor(x / (canvas.tileSize * canvas.hoverW)) * canvas.hoverW,
+      math.floor(y / (canvas.tileSize * canvas.hoverH)) * canvas.hoverH
+  local r = canvas.cols * canvas.tileSize
+  local b = canvas.rows * canvas.tileSize
+
+  local layer = canvas.getCurrentLayer()
+
+  if x >= 0 and x < r and y >= 0 and y < b then
+    canvas.insertTileRect(layer, tx, ty, tindexes)
   end
 end
 
@@ -64,7 +95,8 @@ function canvas.setSelectRectStart(mx, my)
   local b = canvas.rows * canvas.tileSize
 
   if x >= 0 and x < r and y >= 0 and y < b then
-    local tx, ty = math.floor(x / canvas.tileSize), math.floor(y / canvas.tileSize)
+    local tx, ty = math.floor(x / (canvas.tileSize * canvas.hoverW)) * canvas.hoverW,
+        math.floor(y / (canvas.tileSize * canvas.hoverH)) * canvas.hoverH
     canvas.selectRectStart = {
       x = tx,
       y = ty
@@ -80,7 +112,8 @@ function canvas.setSelectRectEnd(mx, my)
   local b = canvas.rows * canvas.tileSize
 
   if x >= 0 and x < r and y >= 0 and y < b then
-    local tx, ty = math.floor(x / canvas.tileSize), math.floor(y / canvas.tileSize)
+    local tx, ty = math.floor(x / (canvas.tileSize * canvas.hoverW)) * canvas.hoverW,
+        math.floor(y / (canvas.tileSize * canvas.hoverH)) * canvas.hoverH
     canvas.selectRectEnd = {
       x = tx,
       y = ty
@@ -103,6 +136,27 @@ function canvas.fillSelectRect(tindex)
 
     if x >= minx and x <= maxx and y >= miny and y <= maxy then
       layer[i] = tindex
+    end
+  end
+end
+
+---@param tindexes integer[][] Tile indexes in rect form
+function canvas.fillSelectRectTiles(tindexes)
+  local layer = canvas.getCurrentLayer()
+  for li, _ in pairs(layer) do
+    local pi = li - 1
+    local x = (pi % canvas.cols)
+    local y = ((pi - x) / canvas.cols)
+
+    if x % #tindexes == 0 and y % #tindexes[1] == 0 then
+      local minx = math.min(canvas.selectRectStart.x, canvas.selectRectEnd.x)
+      local miny = math.min(canvas.selectRectStart.y, canvas.selectRectEnd.y)
+      local maxx = math.max(canvas.selectRectStart.x, canvas.selectRectEnd.x)
+      local maxy = math.max(canvas.selectRectStart.y, canvas.selectRectEnd.y)
+
+      if x >= minx and x <= maxx and y >= miny and y <= maxy then
+        canvas.insertTileRect(layer, x, y, tindexes)
+      end
     end
   end
 end
@@ -142,7 +196,7 @@ function canvas.drawCanvas(ptiles)
   -- draw hover box
   love.graphics.setColor(1, 0, 1, 1)
   love.graphics.rectangle("line", canvas.x + canvas.hoverX * canvas.tileSize, canvas.y + canvas.hoverY * canvas.tileSize,
-    canvas.tileSize, canvas.tileSize)
+    canvas.hoverW * canvas.tileSize, canvas.hoverH * canvas.tileSize)
   -- show meta tooltip
   if canvas.showMeta then
     local i = canvas.hoverY * canvas.rows + canvas.hoverX + 1
@@ -163,13 +217,13 @@ function canvas.drawCanvas(ptiles)
     love.graphics.setColor(1, 0, 1, 0.1)
     love.graphics.rectangle("fill", canvas.x + minx * canvas.tileSize,
       canvas.y + miny * canvas.tileSize,
-      (maxx - minx + 1) * canvas.tileSize,
-      (maxy - miny + 1) * canvas.tileSize)
+      (maxx - minx + 1 * canvas.hoverW) * canvas.tileSize,
+      (maxy - miny + 1 * canvas.hoverH) * canvas.tileSize)
     love.graphics.setColor(1, 0, 1, 1)
     love.graphics.rectangle("line", canvas.x + minx * canvas.tileSize,
       canvas.y + miny * canvas.tileSize,
-      (maxx - minx + 1) * canvas.tileSize,
-      (maxy - miny + 1) * canvas.tileSize)
+      (maxx - minx + 1 * canvas.hoverW) * canvas.tileSize,
+      (maxy - miny + 1 * canvas.hoverH) * canvas.tileSize)
   end
 
   -- reset color
@@ -187,8 +241,8 @@ function canvas.setCanvasHover(mx, my)
   local flag = false
 
   if x >= 0 and x < r and y >= 0 and y < b then
-    canvas.hoverX = math.floor(x / canvas.tileSize)
-    canvas.hoverY = math.floor(y / canvas.tileSize)
+    canvas.hoverX = math.floor(x / (canvas.tileSize * canvas.hoverW)) * canvas.hoverW
+    canvas.hoverY = math.floor(y / (canvas.tileSize * canvas.hoverH)) * canvas.hoverH
     flag = true
   end
 
@@ -209,6 +263,24 @@ function canvas.fillCanvas(tindex)
 
   for i = 1, maxidx do
     layer[i] = tindex
+  end
+end
+
+---Fill the entire canvas with
+---the given tile indexes.
+---@param tindexes integer[][]
+function canvas.fillTiles(tindexes)
+  local layer = canvas.getCurrentLayer()
+  local maxidx = canvas.cols * canvas.rows
+
+  for i = 1, maxidx do
+    local pi = i - 1
+    local x = (pi % canvas.cols)
+    local y = ((pi - x) / canvas.cols)
+
+    if x % #tindexes == 0 and y % #tindexes[1] == 0 then
+      canvas.insertTileRect(layer, x, y, tindexes)
+    end
   end
 end
 
