@@ -8,9 +8,9 @@ local canvas = {
   hoverY = 0,
   hoverW = 2,
   hoverH = 2,
-  ---@type nil|number[]
+  ---@type nil|{ x: number, y: number }
   selectRectStart = nil,
-  ---@type nil|number[]
+  ---@type nil|{ x: number, y: number }
   selectRectEnd = nil,
   showMeta = false,
   currentLayer = 1,
@@ -203,7 +203,9 @@ function canvas.drawCanvas(ptiles)
     local tidx = canvas.getCurrentLayer()[i]
     local x = canvas.x + canvas.hoverX * canvas.tileSize
     local y = canvas.y + canvas.hoverY * canvas.tileSize
-    love.graphics.print(tidx .. " : " .. canvas.hoverX .. ", " .. canvas.hoverY, x, y - canvas.tileSize)
+    if tidx ~= nil then
+      love.graphics.print(tidx .. " : " .. canvas.hoverX .. ", " .. canvas.hoverY, x, y - canvas.tileSize)
+    end
   end
 
   -- draw select rect

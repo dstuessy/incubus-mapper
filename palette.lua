@@ -1,4 +1,3 @@
----@class Palette
 local palette = {
   x = 0,
   y = 0,
@@ -8,8 +7,13 @@ local palette = {
   count = 0,
   hoverX = 0,
   hoverY = 0,
-  selectX = 0,
-  selectY = 0,
+  -- selectX = 0,
+  -- selectY = 0,
+  selecting = false,
+  ---@type nil|{ x: number, y: number }
+  selectRectStart = nil,
+  ---@type nil|{ x: number, y: number }
+  selectRectEnd = nil,
   showMeta = false,
   ---@type (love.Image | nil)[]
   tiles = {}
@@ -88,12 +92,31 @@ function palette.drawPalette()
     palette.tileSize, palette.tileSize)
 
   -- draw select box
-  love.graphics.setColor(1, 0, 1, 0.2)
-  love.graphics.rectangle("fill", palette.selectX * palette.tileSize, palette.selectY * palette.tileSize,
-    palette.tileSize, palette.tileSize)
-  love.graphics.setColor(1, 0, 1, 1)
-  love.graphics.rectangle("line", palette.selectX * palette.tileSize, palette.selectY * palette.tileSize,
-    palette.tileSize, palette.tileSize)
+  -- love.graphics.setColor(1, 0, 1, 0.2)
+  -- love.graphics.rectangle("fill", palette.selectX * palette.tileSize, palette.selectY * palette.tileSize,
+  --   palette.tileSize, palette.tileSize)
+  -- love.graphics.setColor(1, 0, 1, 1)
+  -- love.graphics.rectangle("line", palette.selectX * palette.tileSize, palette.selectY * palette.tileSize,
+  --   palette.tileSize, palette.tileSize)
+  -- draw select box
+  if palette.selectRectStart and palette.selectRectEnd then
+    local minx = math.min(palette.selectRectEnd.x, palette.selectRectStart.x)
+    local maxx = math.max(palette.selectRectEnd.x, palette.selectRectStart.x)
+
+    local miny = math.min(palette.selectRectEnd.y, palette.selectRectStart.y)
+    local maxy = math.max(palette.selectRectEnd.y, palette.selectRectStart.y)
+
+    love.graphics.setColor(1, 0, 1, 0.1)
+    love.graphics.rectangle("fill", palette.x + minx * palette.tileSize,
+      palette.y + miny * palette.tileSize,
+      (maxx - minx + 1) * palette.tileSize,
+      (maxy - miny + 1) * palette.tileSize)
+    love.graphics.setColor(1, 0, 1, 1)
+    love.graphics.rectangle("line", palette.x + minx * palette.tileSize,
+      palette.y + miny * palette.tileSize,
+      (maxx - minx + 1) * palette.tileSize,
+      (maxy - miny + 1) * palette.tileSize)
+  end
 
   -- draw palette border
   love.graphics.setColor(0, 0, 0, 1)
@@ -115,16 +138,29 @@ end
 
 ---@return integer[][]
 function palette.getSelectedTiles()
-  return {
-    {
-      palette.selectY * palette.cols + palette.selectX,
-      (palette.selectY) * palette.cols + palette.selectX + 1,
-    },
-    {
-      (palette.selectY + 1) * palette.cols + palette.selectX,
-      (palette.selectY + 1) * palette.cols + palette.selectX + 1,
-    }
-  }
+  if not palette.selectRectStart or not palette.selectRectEnd then
+    return { {} }
+  end
+  local minx = math.min(palette.selectRectEnd.x, palette.selectRectStart.x)
+  local maxx = math.max(palette.selectRectEnd.x, palette.selectRectStart.x)
+  local miny = math.min(palette.selectRectEnd.y, palette.selectRectStart.y)
+  local maxy = math.max(palette.selectRectEnd.y, palette.selectRectStart.y)
+  ---@type integer[][]
+  local tiles = {}
+
+  for ty = miny, maxy do
+    for tx = minx, maxx do
+      local yi = ty - miny
+      local xi = tx - minx
+      local tidx = ty * palette.cols + tx
+      if tiles[yi + 1] == nil then
+        tiles[yi + 1] = {}
+      end
+      tiles[yi + 1][xi + 1] = tidx
+    end
+  end
+
+  return tiles
 end
 
 ---Sets the palette coordinates for mouse hover
@@ -149,18 +185,65 @@ end
 ---@param mx integer Mouse x position
 ---@param my integer Mouse y position
 ---@return boolean flag if palette was clicked
-function palette.setPaletteSelect(mx, my)
+-- function palette.setPaletteSelect(mx, my)
+--   local flag = false
+--   local w = palette.cols * palette.tileSize
+--   local h = palette.rows * palette.tileSize
+--
+--   if mx >= palette.x and mx < palette.x + w and my >= palette.y and my < palette.y + h then
+--     palette.selectX = math.floor(mx / palette.tileSize)
+--     palette.selectY = math.floor(my / palette.tileSize)
+--     flag = true
+--   end
+--
+--   return flag
+-- end
+
+---Sets the palette coordinates for the starting point of
+---the rectangular area selection
+---@param mx integer Mouse x position
+---@param my integer Mouse y position
+---@return boolean flag if palette was clicked
+function palette.setPaletteSelectRectStart(mx, my)
   local flag = false
   local w = palette.cols * palette.tileSize
   local h = palette.rows * palette.tileSize
 
   if mx >= palette.x and mx < palette.x + w and my >= palette.y and my < palette.y + h then
-    palette.selectX = math.floor(mx / palette.tileSize)
-    palette.selectY = math.floor(my / palette.tileSize)
+    palette.selectRectStart = {
+      x = math.floor(mx / palette.tileSize),
+      y = math.floor(my / palette.tileSize)
+    }
     flag = true
   end
 
   return flag
+end
+
+---Sets the palette coordinates for the end point of
+---the rectangular area selection
+---@param mx integer Mouse x position
+---@param my integer Mouse y position
+---@return boolean flag if palette was clicked
+function palette.setPaletteSelectRectEnd(mx, my)
+  local flag = false
+  local w = palette.cols * palette.tileSize
+  local h = palette.rows * palette.tileSize
+
+  if mx >= palette.x and mx < palette.x + w and my >= palette.y and my < palette.y + h then
+    palette.selectRectEnd = {
+      x = math.floor(mx / palette.tileSize),
+      y = math.floor(my / palette.tileSize)
+    }
+    flag = true
+  end
+
+  return flag
+end
+
+function palette.clearSelectRect()
+  palette.selectRectStart = nil
+  palette.selectRectEnd = nil
 end
 
 return palette

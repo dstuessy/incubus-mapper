@@ -66,11 +66,22 @@ function love.update()
   local lhovered = layerPalette.setHover(mx, my)
 
   if not phovered and not lhovered then
+    local tindexes = palette.getSelectedTiles()
+    canvas.hoverH = #tindexes
+    canvas.hoverW = #tindexes[1]
     canvas.setCanvasHover(mx, my)
   end
 
   if love.mouse.isDown(1) then
-    local paletteSelected = palette.setPaletteSelect(mx, my)
+    local paletteSelected = false
+
+    if not palette.selecting then
+      paletteSelected = palette.setPaletteSelectRectStart(mx, my)
+      palette.selecting = true
+    else
+      paletteSelected = palette.setPaletteSelectRectEnd(mx, my)
+    end
+
     local saveClicked = saveButton.down(mx, my)
     local selectedLayer = layerPalette.select(mx, my)
 
@@ -109,6 +120,8 @@ function love.update()
     canvas.moveCanvas(mx - pmx, my - pmy)
   else
     saveButton.up(mx, my)
+
+    palette.selecting = false
 
     if love.keyboard.isDown("lshift") and canvas.selectRectStart and canvas.selectRectEnd then
       local tindexes = palette.getSelectedTiles()
