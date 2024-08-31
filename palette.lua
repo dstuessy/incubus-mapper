@@ -10,6 +10,7 @@ local palette = {
   hoverY = 0,
   selectX = 0,
   selectY = 0,
+  showMeta = false,
   ---@type (love.Image | nil)[]
   tiles = {}
 }
@@ -98,6 +99,15 @@ function palette.drawPalette()
   love.graphics.setColor(0, 0, 0, 1)
   love.graphics.rectangle("line", palette.x, palette.y, palette.x + palette.cols * palette.tileSize,
     palette.y + palette.rows * palette.tileSize)
+
+  -- show meta tooltip
+  if palette.showMeta then
+    love.graphics.setColor(1, 0, 1, 1)
+    local tidx = palette.hoverY * palette.cols + palette.hoverX
+    local x = palette.x + palette.hoverX * palette.tileSize
+    local y = palette.y + palette.hoverY * palette.tileSize
+    love.graphics.print(tidx .. " : " .. palette.hoverX .. ", " .. palette.hoverY, x, y + palette.tileSize)
+  end
 
   -- reset color
   love.graphics.setColor(1, 1, 1, 1)

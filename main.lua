@@ -118,8 +118,10 @@ function love.update()
 
     if love.keyboard.isDown("tab") then
       canvas.showMeta = true
+      palette.showMeta = true
     else
       canvas.showMeta = false
+      palette.showMeta = false
     end
   end
 

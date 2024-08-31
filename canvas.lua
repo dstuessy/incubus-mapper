@@ -143,7 +143,7 @@ function canvas.drawCanvas(ptiles)
   love.graphics.setColor(1, 0, 1, 1)
   love.graphics.rectangle("line", canvas.x + canvas.hoverX * canvas.tileSize, canvas.y + canvas.hoverY * canvas.tileSize,
     canvas.tileSize, canvas.tileSize)
-  -- show tile index
+  -- show meta tooltip
   if canvas.showMeta then
     local i = canvas.hoverY * canvas.rows + canvas.hoverX + 1
     local tidx = canvas.getCurrentLayer()[i]
