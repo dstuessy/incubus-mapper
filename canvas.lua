@@ -47,9 +47,6 @@ function canvas.insertCanvasTile(mx, my, tindex)
   local b = canvas.rows * canvas.tileSize
 
   local layer = canvas.getCurrentLayer()
-  if not layer then
-    return
-  end
 
   if x >= 0 and x < r and y >= 0 and y < b then
     local tx, ty = math.floor(x / canvas.tileSize), math.floor(y / canvas.tileSize)
@@ -148,9 +145,11 @@ function canvas.drawCanvas(ptiles)
     canvas.tileSize, canvas.tileSize)
   -- show tile index
   if canvas.showMeta then
+    local i = canvas.hoverY * canvas.rows + canvas.hoverX + 1
+    local tidx = canvas.getCurrentLayer()[i]
     local x = canvas.x + canvas.hoverX * canvas.tileSize
-    local y = canvas.y + (canvas.hoverY - 1) * canvas.tileSize
-    love.graphics.print(canvas.hoverX .. ", " .. canvas.hoverY, x, y)
+    local y = canvas.y + canvas.hoverY * canvas.tileSize
+    love.graphics.print(tidx .. " : " .. canvas.hoverX .. ", " .. canvas.hoverY, x, y - canvas.tileSize)
   end
 
   -- draw select rect
