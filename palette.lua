@@ -92,13 +92,6 @@ function palette.drawPalette()
     palette.tileSize, palette.tileSize)
 
   -- draw select box
-  -- love.graphics.setColor(1, 0, 1, 0.2)
-  -- love.graphics.rectangle("fill", palette.selectX * palette.tileSize, palette.selectY * palette.tileSize,
-  --   palette.tileSize, palette.tileSize)
-  -- love.graphics.setColor(1, 0, 1, 1)
-  -- love.graphics.rectangle("line", palette.selectX * palette.tileSize, palette.selectY * palette.tileSize,
-  --   palette.tileSize, palette.tileSize)
-  -- draw select box
   if palette.selectRectStart and palette.selectRectEnd then
     local minx = math.min(palette.selectRectEnd.x, palette.selectRectStart.x)
     local maxx = math.max(palette.selectRectEnd.x, palette.selectRectStart.x)
@@ -180,24 +173,6 @@ function palette.setPaletteHover(mx, my)
 
   return flag
 end
-
----Sets the palette coordinates for mouse select
----@param mx integer Mouse x position
----@param my integer Mouse y position
----@return boolean flag if palette was clicked
--- function palette.setPaletteSelect(mx, my)
---   local flag = false
---   local w = palette.cols * palette.tileSize
---   local h = palette.rows * palette.tileSize
---
---   if mx >= palette.x and mx < palette.x + w and my >= palette.y and my < palette.y + h then
---     palette.selectX = math.floor(mx / palette.tileSize)
---     palette.selectY = math.floor(my / palette.tileSize)
---     flag = true
---   end
---
---   return flag
--- end
 
 ---Sets the palette coordinates for the starting point of
 ---the rectangular area selection
