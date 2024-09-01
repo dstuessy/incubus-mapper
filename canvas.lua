@@ -38,23 +38,6 @@ function canvas.getCurrentLayer()
   return canvas.tiles[canvas.currentLayer]
 end
 
----@param mx integer Mouse x position
----@param my integer Mouse y position
----@param tindex integer Tile index
-function canvas.insertCanvasTile(mx, my, tindex)
-  local x, y = mx - canvas.x, my - canvas.y
-  local r = canvas.cols * canvas.tileSize
-  local b = canvas.rows * canvas.tileSize
-
-  local layer = canvas.getCurrentLayer()
-
-  if x >= 0 and x < r and y >= 0 and y < b then
-    local tx, ty = math.floor(x / canvas.tileSize), math.floor(y / canvas.tileSize)
-    local tp = ty * canvas.cols + tx
-    layer[tp + 1] = tindex
-  end
-end
-
 ---@param tiles integer[] List of tiles
 ---@param x integer Top left position of tile rectangle
 ---@param y integer Top left position of tile rectangle
