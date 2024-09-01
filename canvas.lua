@@ -250,17 +250,6 @@ function canvas.fillTiles(tindexes)
   end
 end
 
----@param list table
----@param start integer
----@param last integer
-local function unpackChunk(list, start, last)
-  start = start or 1
-  last = last or #list
-  if start <= last then
-    return list[start], unpackChunk(list, start + 1, last)
-  end
-end
-
 ---@return nil|love.Data
 function canvas.serialize()
   ---@type integer[]
