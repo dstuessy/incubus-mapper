@@ -104,25 +104,6 @@ function canvas.setSelectRectEnd(mx, my)
   end
 end
 
----@param tindex integer Tile index
-function canvas.fillSelectRect(tindex)
-  local layer = canvas.getCurrentLayer()
-  for i, _ in pairs(layer) do
-    local pi = i - 1
-    local x = (pi % canvas.cols)
-    local y = ((pi - x) / canvas.cols)
-
-    local minx = math.min(canvas.selectRectStart.x, canvas.selectRectEnd.x)
-    local miny = math.min(canvas.selectRectStart.y, canvas.selectRectEnd.y)
-    local maxx = math.max(canvas.selectRectStart.x, canvas.selectRectEnd.x)
-    local maxy = math.max(canvas.selectRectStart.y, canvas.selectRectEnd.y)
-
-    if x >= minx and x <= maxx and y >= miny and y <= maxy then
-      layer[i] = tindex
-    end
-  end
-end
-
 ---@param tindexes integer[][] Tile indexes in rect form
 function canvas.fillSelectRectTiles(tindexes)
   local layer = canvas.getCurrentLayer()
