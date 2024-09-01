@@ -106,12 +106,17 @@ function love.update()
 
       if love.keyboard.isDown("lalt") then
         canvas.fillTiles(tindexes)
-      elseif love.keyboard.isDown("lshift") then
+      elseif canvas.selectBuffer == nil and love.keyboard.isDown("lshift") or love.keyboard.isDown("lctrl") then
         if not canvas.selectRectStart then
           canvas.setSelectRectStart(mx, my)
         else
           canvas.setSelectRectEnd(mx, my)
         end
+      elseif canvas.selectBuffer ~= nil then
+        local x = math.floor((mx - canvas.x) / canvas.tileSize)
+        local y = math.floor((my - canvas.y) / canvas.tileSize)
+        canvas.insertTileRect(canvas.getCurrentLayer(), x, y, canvas.selectBuffer)
+        canvas.clearSelectBuffer()
       else
         canvas.insertTiles(mx, my, tindexes)
       end
@@ -126,6 +131,11 @@ function love.update()
     if love.keyboard.isDown("lshift") and canvas.selectRectStart and canvas.selectRectEnd then
       local tindexes = palette.getSelectedTiles()
       canvas.fillSelectRectTiles(tindexes)
+      canvas.clearSelectRect()
+    end
+
+    if love.keyboard.isDown("lctrl") and canvas.selectRectStart and canvas.selectRectEnd then
+      canvas.fillSelectBuffer()
       canvas.clearSelectRect()
     end
 

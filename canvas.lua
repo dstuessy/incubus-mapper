@@ -14,6 +14,8 @@ local canvas = {
   selectRectEnd = nil,
   showMeta = false,
   currentLayer = 1,
+  ---@type nil|integer[][]
+  selectBuffer = nil,
   ---Palette indexes
   ---@type integer[][]
   tiles = {
@@ -125,9 +127,47 @@ function canvas.fillSelectRectTiles(tindexes)
   end
 end
 
+---@return integer[][]
+function canvas.getSelectedTiles()
+  if not canvas.selectRectStart or not canvas.selectRectEnd then
+    return { {} }
+  end
+  local minx = math.min(canvas.selectRectEnd.x, canvas.selectRectStart.x)
+  local maxx = math.max(canvas.selectRectEnd.x, canvas.selectRectStart.x)
+  local miny = math.min(canvas.selectRectEnd.y, canvas.selectRectStart.y)
+  local maxy = math.max(canvas.selectRectEnd.y, canvas.selectRectStart.y)
+  local layer = canvas.getCurrentLayer()
+  ---@type integer[][]
+  local tiles = {}
+
+  for ty = miny, maxy do
+    for tx = minx, maxx do
+      local yi = ty - miny
+      local xi = tx - minx
+      local ti = ty * canvas.cols + tx
+      local tidx = layer[ti + 1]
+      if tiles[yi + 1] == nil then
+        tiles[yi + 1] = {}
+      end
+      tiles[yi + 1][xi + 1] = tidx
+    end
+  end
+
+  return tiles
+end
+
 function canvas.clearSelectRect()
   canvas.selectRectStart = nil
   canvas.selectRectEnd = nil
+end
+
+function canvas.fillSelectBuffer()
+  local tindexes = canvas.getSelectedTiles()
+  canvas.selectBuffer = tindexes
+end
+
+function canvas.clearSelectBuffer()
+  canvas.selectBuffer = nil
 end
 
 ---@param ptiles (love.Image | nil)[] Palette tiles
