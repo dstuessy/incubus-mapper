@@ -261,18 +261,6 @@ function canvas.moveCanvas(dx, dy)
 end
 
 ---Fill the entire canvas with
----the given tile index.
----@param tindex number
-function canvas.fillCanvas(tindex)
-  local layer = canvas.getCurrentLayer()
-  local maxidx = canvas.cols * canvas.rows
-
-  for i = 1, maxidx do
-    layer[i] = tindex
-  end
-end
-
----Fill the entire canvas with
 ---the given tile indexes.
 ---@param tindexes integer[][]
 function canvas.fillTiles(tindexes)
