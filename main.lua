@@ -37,6 +37,7 @@ function love.load(args)
       error(err)
     end
     canvas.load(data)
+    love.window.setTitle(datapath)
   end
 
   local _, h = love.graphics.getDimensions()
